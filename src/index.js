@@ -61,12 +61,8 @@ function returnFnResult(fn) {
  */
 function returnCounter(number = 0) {
 
-    if (!returnCounter.savedNumber || number === 0) {
-        returnCounter.savedNumber = number;
-    }
-
     var f = function() {
-        return ++returnCounter.savedNumber;
+        return ++number;
     };
 
     return f;
@@ -100,9 +96,38 @@ function returnArgumentsArray(...args) {
 
    console.log(newSum()) выведет 6
  */
+
+// Вариант 1 (с bind)
+// function bindFunction(fn, ...args) {
+//     return fn.bind(null, ...args);
+// }
+
+// Вариант 2 (с оберткой)
 function bindFunction(fn, ...args) {
-    return fn.bind(null, ...args);
+    return () => {
+        return fn(...args);
+    }
 }
+
+// Вариант 3 (с apply)
+// function bindFunction(fn, ...args) {
+//     return () => {
+//         return fn.apply(null, args);
+//     }
+// }
+
+// Вариант 4 - npm run start - тесты проходят. Но при ручном тестировании это не работает
+// function sum(a, b) {
+//   return a + b;
+// }
+
+// var newSum = bindFunction(sum, 2, 4, 5);
+// console.log(newSum());
+// function bindFunction(fn, ...args) {
+//     return () => {
+//         return fn.apply(null, ...args);
+//     }
+// }
 
 export {
     returnFirstArgument,

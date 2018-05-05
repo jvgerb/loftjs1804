@@ -116,19 +116,6 @@ function bindFunction(fn, ...args) {
 //     }
 // }
 
-// Вариант 4 - npm run start - тесты проходят. Но при ручном тестировании это не работает
-// function sum(a, b) {
-//   return a + b;
-// }
-
-// var newSum = bindFunction(sum, 2, 4, 5);
-// console.log(newSum());
-// function bindFunction(fn, ...args) {
-//     return () => {
-//         return fn.apply(null, ...args);
-//     }
-// }
-
 export {
     returnFirstArgument,
     sumWithDefaults,

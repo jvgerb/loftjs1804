@@ -54,7 +54,12 @@ function prepend(what, where) {
    findAllPSiblings(document.body) // функция должна вернуть массив с элементами div и span т.к. следующим соседом этих элементов является элемент с тегом P
  */
 function findAllPSiblings(where) {
-    return [...(where.children)].filter((el, i, arr) => arr[i + 1] !== undefined && arr[i + 1].tagName === 'P');
+    let f = (el, i, arr) =>
+        arr[i + 1] !== undefined &&
+        arr[i + 1].tagName === 'P';
+
+    return [...(where.children)]
+        .filter(f);
 }
 
 /*
@@ -135,7 +140,7 @@ var objAddInfo = (obj, key) => obj[key] = (obj[key] || 0) + 1
  */
 var elInfo = (e) => ({
     tag: e.tagName,
-    classes: e.classList.value.split(' '),
+    classes: e.classList && e.classList.value ? e.classList.value.split(' ') : [],
     isText: e.nodeType === 3
 });
 

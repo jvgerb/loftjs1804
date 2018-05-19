@@ -27,7 +27,7 @@ function createDivWithText(text) {
    prepend(document.querySelector('#one'), document.querySelector('#two')) // добавит элемент переданный первым аргументом в начало элемента переданного вторым аргументом
  */
 function prepend(what, where) {
-    var fc = where.firstChild;
+    let fc = where.firstChild;
 
     where.insertBefore(what, fc);
 
@@ -118,7 +118,6 @@ function deleteTextNodesRecursive(where) {
 
             return;
         }
-
         deleteTextNodesRecursive(el);
     })
 }
@@ -128,17 +127,16 @@ function deleteTextNodesRecursive(where) {
  * @param {object} obj - объект
  * @param {string} key - название свойства
  */
-var objAddInfo = (obj, key) => obj[key] = (obj[[key]] || 0) + 1
+var objAddInfo = (obj, key) => obj[key] = (obj[key] || 0) + 1
 
 /**
  * Собирает информацию о теге, классах и типе html-элемента
  * @param {*} el - html-элемент
  */
-var elInfo = (el) => ({
-    tag: el.tagName,
-    classes: el.classList && el.classList.value ?
-        el.classList.value.split(' ') : '',
-    isText: el.nodeType === 3
+var elInfo = (e) => ({
+    tag: e.tagName,
+    classes: e.classList.value.split(' '),
+    isText: e.nodeType === 3
 });
 
 /*
@@ -181,9 +179,7 @@ function collectDOMStat(root) {
             textsCount++;
         } else {
             objAddInfo(tags, info.tag);
-            if (info.classes.length) {
-                info.classes.forEach((cl) => objAddInfo(classes, cl));
-            }
+            info.classes.forEach((cl) => objAddInfo(classes, cl));
         }
         // заносим дочерние элементы в список обработки
         elements.push(...current.childNodes);

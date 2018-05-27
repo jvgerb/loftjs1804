@@ -142,6 +142,39 @@ function searchTowns(searchKey, searchFunc) {
         });
 }
 
+/**
+ * Обеспечивает вызов функции f не чаще, чем 1 раз в ms миллисекунд
+ * @param {function} f - функция
+ * @param {int} ms - интервал задержки
+ */
+function debounce(f, ms) {
+
+    let timer = null;
+
+    // возвращаем обертку с возможностью указать ей аргументы при вызове
+    return function(...args) {
+        const runFunc = () => {
+            // выполняем функцию с контекстом, в котором была бы вызвана f, и с аргументами f
+            f.apply(this, args);
+            // обнуляем таймер
+            timer = null;
+        }
+
+        // обнуляем предыдущий заданный таймер
+        if (timer) {
+            clearTimeout(timer);
+        }
+
+        // заводим новый таймер
+        timer = setTimeout(runFunc, ms);
+    }
+}
+
+/**
+ * Поиск и загрузка найденных куки не чаще, чем один раз в 0.8 сек
+ */
+let waitSearch = debounce(searchTowns, 800);
+
 /* Блок с надписью "Загрузка" */
 const loadingBlock = homeworkContainer.querySelector('#loading-block');
 /* Блок с текстовым полем и результатом поиска */
@@ -159,7 +192,7 @@ const makeError = homeworkContainer.querySelector('#make-error');
 
 filterInput.addEventListener('keyup', function() {
     // это обработчик нажатия клавиш в текстовом поле
-    setTimeout(() => searchTowns(filterInput.value, makeError.checked ? loadTownsError : loadTowns), 800);
+    waitSearch(filterInput.value, makeError.checked ? loadTownsError : loadTowns);
 });
 
 repeatSearch.addEventListener('click', function() {

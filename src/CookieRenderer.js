@@ -33,29 +33,33 @@ export default function CookieRenderer(listTableEl, cookieRepository) {
 
         // добавить обработчик на удаление куки
         btnDel.addEventListener('click', function() {
-            deleteCookie(btnDel, listTable, deleteCookieFromRepo);
+            let name = btnDel.getAttribute('cookie'),
+                tr = btnDel.closest('tr');
+
+            deleteCookie(name, listTable, tr, deleteCookieFromRepo);
         })
     }
 
     /**
      * Удаляет cookie с имененем name из документа и из таблицы
-     * @param {object} delButton - Кнопка удаления в строке таблицы
+     * @param {string} name - наименование куки
      * @param {object} listTable - html-элемент таблицы
+     * @param {object} trCookie - html-элемент строки таблицы, содержащей куки
      * @param {function} deleteCookieFromRepo - функция, удаляющая куки из хранилища куков
      */
-    const deleteCookie = (delButton, listTable, deleteCookieFromRepo) => {
-        deleteCookieFromRepo(delButton.getAttribute('cookie'));
-
-        let tr = delButton.closest('tr');
-
-        listTable.removeChild(tr);
+    const deleteCookie = (name, listTable, trCookie, deleteCookieFromRepo) => {
+        deleteCookieFromRepo(name);
+        listTable.removeChild(trCookie);
     }
 
     return {
         loadCookies: function(filter) {
+            // получаем отфильтрованные куки из коллекции
             let filteredCookies = cookieRepository.getFilteredCookiesMap(filter);
 
+            // очищаем таблицу 
             listTableEl.innerHTML = '';
+            // для каждой куки создаем строку в таблице с кнопкой удаления куки
             filteredCookies.forEach((value, key) =>
                 renderCookie(listTableEl, key, value, cookieRepository.removeCookie));
         }

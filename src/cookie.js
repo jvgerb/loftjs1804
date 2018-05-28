@@ -32,109 +32,46 @@
    homeworkContainer.appendChild(newDiv);
  */
 
-/**
- * Получение объекта со всеми куками документа
- */
-function getDocumentCookies() {
-    return new Map(document.cookie
-        .split('; ')
-        .map((item) => item.split('='))
-        .map((arr) => [arr[0], decodeURIComponent(arr[1])]));
-}
+import CookieRepo from './CookieRepo';
+import CookieRenderer from './CookieRenderer';
 
-/**
- * Проверяет наличие вхождения подстроки chunk в строку full без учета регистра
- * @param {string} full - Строка для применения фильтра
- * @param {string} chunk - Искомая подстрока
- */
-function isMatching(full, chunk) {
-    return full.toLowerCase().includes(chunk.toLowerCase());
-}
+const homeworkContainer = document.querySelector('#homework-container');
+// текстовое поле для фильтрации cookie
+const filterNameInput = homeworkContainer.querySelector('#filter-name-input');
+// текстовое поле с именем cookie
+const addNameInput = homeworkContainer.querySelector('#add-name-input');
+// текстовое поле со значением cookie
+const addValueInput = homeworkContainer.querySelector('#add-value-input');
+// кнопка "добавить cookie"
+const addButton = homeworkContainer.querySelector('#add-button');
+// таблица со списком cookie
+const listTable = homeworkContainer.querySelector('#list-table tbody');
 
-/**
- * Выбирает все куки документа, чье имя или значение содержит в себе подстроку filter
- */
-function getFilteredCookies(filter) {
-    let all = getDocumentCookies();
+var cookieRepo = new CookieRepo();
+var cookieRenderer = new CookieRenderer(listTable, cookieRepo);
 
-    if (!filter) {
-        return all;
-    }
-    let filtered = new Map();
+filterNameInput.addEventListener('keyup', function() {
 
-    all.forEach((value, key) => {
-        if (isMatching(key, filter) || isMatching(value, filter)) {
-            filtered.set(key, value);
-        }
-    });
+    // так должно быть для прохождения тестов
+    // loadCookies(); // вместо debounce(loadCookies, 800);
 
-    return filtered;
-}
+    // поиск и загрузка найденных куки не чаще, чем один раз в 1 сек
+    debounce(loadCookies, 800)();
+});
 
-/**
- * Создает строку таблицы для куки с указанными name и value
- * @param {string} name - cookie's name
- * @param {string} value - cookie's value
- */
-function renderCookie(name, value) {
+addButton.addEventListener('click', () => {
+    cookieRepo.insertCookie(addNameInput.value, addValueInput.value);
+    loadCookies();
+});
 
-    let tr = document.createElement('TR'),
-        tdName = document.createElement('TD'),
-        tdValue = document.createElement('TD'),
-        tdDel = document.createElement('TD'),
-        btnDel = document.createElement('button');
-
-    listTable.appendChild(tr);
-    tr.appendChild(tdName);
-    tr.appendChild(tdValue);
-    tr.appendChild(tdDel);
-    tdDel.appendChild(btnDel);
-
-    tdName.innerHTML = name;
-    tdValue.innerHTML = value;
-    btnDel.innerHTML = 'удалить';
-    btnDel.setAttribute('cookie', name);
-
-    // удалить куку
-    btnDel.addEventListener('click', function() {
-        deleteCookie.apply(btnDel);
-    })
-}
-
-/**
- * Удаляет cookie с имененем name из документа и из таблицы
- * @param {string} name - Имя куки
- * @param {object} btn - Кнопка удаления в строке таблицы
- */
-function deleteCookie() {
-    let tr = this.closest('tr');
-
-    listTable.removeChild(tr);
-    document.cookie = `${this.getAttribute('cookie')}="";expires=${new Date(0).toUTCString()}`;
-}
+// загрузка куки при старте страницы
+document.addEventListener('load', loadCookies());
 
 /**
  * Загрузка таблицы кук согласно фильтрации
  */
 function loadCookies() {
-
-    let filteredCookies = getFilteredCookies(filterNameInput.value);
-
-    listTable.innerHTML = '';
-
-    filteredCookies.forEach((value, key) => renderCookie(key, value));
-}
-
-/**
- * Создание куки с указанными name и value
- * @param {string} name - cookie's name
- * @param {string} value - cookie's value
- */
-function createCookie(name, value) {
-    if (name === '' || value === '') {
-        return;
-    }
-    document.cookie = `${name}=${encodeURIComponent(value)}`;
+    cookieRenderer.loadCookies(filterNameInput.value);
 }
 
 /**
@@ -164,36 +101,3 @@ function debounce(f, ms) {
         timer = setTimeout(runFunc, ms);
     }
 }
-
-/**
- * Поиск и загрузка найденных куки не чаще, чем один раз в 1 сек
- */
-let filterLoadCookie = debounce(loadCookies, 1000);
-
-const homeworkContainer = document.querySelector('#homework-container');
-// текстовое поле для фильтрации cookie
-const filterNameInput = homeworkContainer.querySelector('#filter-name-input');
-// текстовое поле с именем cookie
-const addNameInput = homeworkContainer.querySelector('#add-name-input');
-// текстовое поле со значением cookie
-const addValueInput = homeworkContainer.querySelector('#add-value-input');
-// кнопка "добавить cookie"
-const addButton = homeworkContainer.querySelector('#add-button');
-// таблица со списком cookie
-const listTable = homeworkContainer.querySelector('#list-table tbody');
-
-filterNameInput.addEventListener('keyup', function() {
-
-    // так должно быть для прохождения тестов
-    // loadCookies(); // вместо filterLoadCookie();
-
-    filterLoadCookie();
-});
-
-addButton.addEventListener('click', () => {
-    createCookie(addNameInput.value, addValueInput.value);
-    loadCookies();
-});
-
-// загрузка куки при старте страницы
-document.addEventListener('load', loadCookies());

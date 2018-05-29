@@ -71,7 +71,7 @@ document.addEventListener('load', loadCookies());
  * Загрузка таблицы кук согласно фильтрации
  */
 function loadCookies() {
-    cookieRenderer.loadCookies(filterNameInput.value);
+    cookieRenderer.renderCookies(filterNameInput.value);
 }
 
 /**
